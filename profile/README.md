@@ -1,3 +1,4 @@
+![banner](banner-whitetext.webp)
 # Radius Red Ltd.
 
 Radius Red Ltd. is a UK-based consultancy company. 
