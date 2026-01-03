@@ -1,8 +1,7 @@
 ![banner](banner-whitetext.webp)
 # Radius Red Ltd.
 
-Radius Red Ltd. is a UK-based consultancy company. 
-[radiusred.uk](https://www.radiusred.uk) | [contact](mailto:opensource@radiusred.uk)
+Radius Red is a UK-based consultancy company. 
 
 This GitHub organisation hosts a small collection of open-source projects developed and maintained by Radius Red, with an emphasis on:
 
@@ -33,5 +32,5 @@ Please refer to the `CONTRIBUTING.md` file in individual repositories for detail
 
 ---
 
-© Radius Red Ltd.
+© [Radius Red Ltd.](https://www.radiusred.uk) | [contact](mailto:opensource@radiusred.uk)
 
