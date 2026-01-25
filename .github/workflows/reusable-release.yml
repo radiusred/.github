@@ -34,7 +34,7 @@ jobs:
 
       - name: Calculate Version
         id: calc
-        uses: radiusred/.github/.github/actions/calculate-version@main
+        uses: radiusred/.github/.github/actions/calculate_version@main
 
   gate:
     name: Approval Checkpoint
