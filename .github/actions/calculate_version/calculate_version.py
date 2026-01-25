@@ -15,9 +15,9 @@ def run(cmd: str) -> str:
 def main() -> None:
     try:
         last_tag = run("git describe --tags --abbrev=0")
-        commits = run(f"git log {last_tag}..HEAD --oneline").splitlines()
+        commits = run(f"git log {last_tag}..HEAD --pretty=format:%s").splitlines()
     except Exception:
-        commits = run("git log --oneline").splitlines()
+        commits = run("git log --pretty=format:%s").splitlines()
         last_tag = "v0.0.0"
 
     commit_headers = commits
