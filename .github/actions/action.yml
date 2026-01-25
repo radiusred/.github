@@ -1,0 +1,19 @@
+name: Calculate Version
+description: Determine semantic version bump and update Hatch version
+
+outputs:
+  bump_type:
+    description: SemVer bump type
+    value: ${{ steps.calc.outputs.bump_type }}
+  new_tag:
+    description: New version tag
+    value: ${{ steps.calc.outputs.new_tag }}
+
+runs:
+  using: composite
+  steps:
+    - id: calc
+      shell: bash
+      run: |
+        pip install hatch
+        python ${{ github.action_path }}/calculate_version.py
