@@ -71,5 +71,5 @@ jobs:
           hatch version ${{ needs.analyze.outputs.bump_type }}
           git add -A
           git commit -m "chore: release ${{ needs.analyze.outputs.new_tag }} [skip ci]"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main --follow-tags
           gh release create ${{ needs.analyze.outputs.new_tag }} --generate-notes
