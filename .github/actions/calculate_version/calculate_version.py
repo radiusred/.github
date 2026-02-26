@@ -3,6 +3,7 @@
 import subprocess
 import os
 import re
+import tomllib
 
 BREAKING_HEADER_RE = re.compile(r"^[a-z]+(\([^)]+\))?!:")
 FEAT_RE = re.compile(r"^feat(\([^)]+\))?:", re.IGNORECASE)
@@ -10,6 +11,27 @@ FEAT_RE = re.compile(r"^feat(\([^)]+\))?:", re.IGNORECASE)
 
 def run(cmd: str) -> str:
     return subprocess.check_output(cmd, shell=True, text=True).strip()
+
+
+def get_current_version() -> str:
+    with open("pyproject.toml", "rb") as f:
+        data = tomllib.load(f)
+    version_file = data["tool"]["hatch"]["version"]["path"]
+    content = open(version_file).read()
+    m = re.search(r'__version__\s*=\s*"([^"]+)"', content)
+    if not m:
+        raise ValueError(f"No __version__ found in {version_file}")
+    return m.group(1)
+
+
+def bump_version(version: str, bump: str) -> str:
+    major, minor, patch = (int(x) for x in version.split("."))
+    if bump == "major":
+        return f"{major + 1}.0.0"
+    elif bump == "minor":
+        return f"{major}.{minor + 1}.0"
+    else:
+        return f"{major}.{minor}.{patch + 1}"
 
 
 def main() -> None:
@@ -34,8 +56,8 @@ def main() -> None:
     else:
         bump = "patch"
 
-    run(f"hatch version {bump}")
-    new_version = run("hatch version")
+    current_version = get_current_version()
+    new_version = bump_version(current_version, bump)
 
     summary_path = os.environ["GITHUB_STEP_SUMMARY"]
     output_path = os.environ["GITHUB_OUTPUT"]

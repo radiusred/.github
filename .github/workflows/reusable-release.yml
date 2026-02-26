@@ -67,8 +67,17 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          pip install hatch
-          hatch version ${{ needs.analyze.outputs.bump_type }}
+          python3 - << 'EOF'
+          import tomllib, re
+          with open("pyproject.toml", "rb") as f:
+              data = tomllib.load(f)
+          version_file = data["tool"]["hatch"]["version"]["path"]
+          new_ver = "${{ needs.analyze.outputs.new_tag }}".lstrip("v")
+          content = open(version_file).read()
+          new_content = re.sub(r'(__version__\s*=\s*")[^"]*(")', f'\\g<1>{new_ver}\\2', content)
+          with open(version_file, "w") as f:
+              f.write(new_content)
+          EOF
           git add -A
           git commit -m "chore: release ${{ needs.analyze.outputs.new_tag }} [skip ci]"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main --follow-tags

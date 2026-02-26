@@ -15,5 +15,4 @@ runs:
     - id: calc
       shell: bash
       run: |
-        pip install hatch
         python ${{ github.action_path }}/calculate_version.py
