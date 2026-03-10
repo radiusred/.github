@@ -10,6 +10,9 @@ Background and history that may be of use...
 
 The goal of this session is to ...
 
+The goal is successfully achieved when...
+
+
 ## Approach
 
  - detailed bullet list of requirements
