@@ -29,7 +29,7 @@ When following project briefs, any questions or additional context should be cap
 
 Always provide a summary of actions in an `## Output` section at the end of the brief so that the brief, the summary and the code changes can be captured in the same commit.
 
-Always provide the output from `/cost` in a `## Cost` section at the end of the brief using the following template format
+Always provide the output from `/cost` in a `## Cost` section at the end of the brief using the following template format. (Ask the user to run the `/cost` command to make the data available to you).
 
 ```markdown
 ## Cost
