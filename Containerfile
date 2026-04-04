@@ -8,7 +8,7 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Stage 2: Runtime image
-FROM --platform=linux/amd64 ghcr.io/paperclipai/paperclip:latest
+FROM --platform=linux/amd64 ghcr.io/davison/paperclip:local-integration-latest
 
 COPY --from=deps /opt/google-cloud-sdk/ /opt/google-cloud-sdk/
 ENV PATH="/opt/google-cloud-sdk/bin:${PATH}"
