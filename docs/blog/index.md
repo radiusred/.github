@@ -30,4 +30,13 @@ This blog is part of our open-source practice. Content here is public-safe and d
 
 ---
 
+## License
+
+Licensed under the Apache License, Version 2.0.
+See: https://www.apache.org/licenses/LICENSE-2.0
+
+Copyright 2026 [Radius Red Ltd.](https://github.com/radiusred) | [Contact](mailto:opensource@radiusred.uk)
+
+---
+
 <a href="https://www.radiusred.uk">Radius Red Ltd.</a> | <a href="mailto:opensource@radiusred.uk">Contact</a>
