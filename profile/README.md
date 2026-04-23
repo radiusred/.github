@@ -13,14 +13,12 @@ Our bias is toward:
 - reproducible workflows
 - small, maintainable systems
 
-## Repositories
+## Public Repositories
 
 - [`tradedesk`](https://github.com/radiusred/tradedesk)  
   Event-driven Python framework for building, backtesting, and running systematic trading strategies across backtest and live broker environments.
 - [`tradedesk-dukascopy`](https://github.com/radiusred/tradedesk-dukascopy)  
   Dukascopy downloader and exporter for producing deterministic local market data files for backtesting workflows.
-- [`.github`](https://github.com/radiusred/.github)  
-  Shared GitHub Actions and organisation-level documentation used across Radius Red repositories.
 
 ## How We Work
 
