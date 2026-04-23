@@ -19,6 +19,8 @@ Our bias is toward:
   Event-driven Python framework for building, backtesting, and running systematic trading strategies across backtest and live broker environments.
 - [`tradedesk-dukascopy`](https://github.com/radiusred/tradedesk-dukascopy)  
   Dukascopy downloader and exporter for producing deterministic local market data files for backtesting workflows.
+- [`ha-sinkhole`](https://github.com/radiusred/ha-sinkhole)  
+  Local DNS sinkhole server, inspired by pi-hole but designed to be highly available.
 
 ## How We Work
 
