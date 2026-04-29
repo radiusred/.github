@@ -27,6 +27,7 @@ plugins:
 nav:
   - Home: index.md
   - Blog: blog/index.md
+  - Blog Repo Policy: blog/repository-policy.md
 
 extra:
   social:
