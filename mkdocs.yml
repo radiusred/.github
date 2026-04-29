@@ -1,0 +1,49 @@
+site_name: Radius Red
+site_url: https://radiusred.github.io/.github/
+repo_url: https://github.com/radiusred/.github
+repo_name: radiusred/.github
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: red
+      accent: red
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - blog:
+      blog_dir: blog
+      blog_toc: true
+      post_date_format: long
+      post_url_format: "{date}/{slug}"
+
+nav:
+  - Home: index.md
+  - Blog: blog/index.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/radiusred
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/radiusred.bsky.social
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - toc:
+      permalink: true
