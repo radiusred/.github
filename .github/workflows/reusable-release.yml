@@ -61,7 +61,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
-      - name: Release
+      - name: Bump Version and Push
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -80,5 +80,24 @@ jobs:
           EOF
           git add -A
           git commit -m "chore: release ${{ needs.analyze.outputs.new_tag }} [skip ci]"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main --follow-tags
-          gh release create ${{ needs.analyze.outputs.new_tag }} --generate-notes
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main
+
+      - name: Generate Release Notes
+        id: notes
+        if: hashFiles('cliff.toml') != ''
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --unreleased --tag ${{ needs.analyze.outputs.new_tag }} --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create ${{ needs.analyze.outputs.new_tag }} --notes-file RELEASE_NOTES.md
+          else
+            gh release create ${{ needs.analyze.outputs.new_tag }} --generate-notes
+          fi
