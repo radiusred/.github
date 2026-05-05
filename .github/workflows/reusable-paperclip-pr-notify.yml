@@ -1,0 +1,98 @@
+name: Reusable Paperclip PR notification
+
+on:
+  workflow_call:
+    secrets:
+      PAPERCLIP_API_URL:
+        required: true
+      PAPERCLIP_API_KEY:
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: >-
+      endsWith(github.event.pull_request.user.login, '[bot]') &&
+      (github.event_name != 'pull_request' || !github.event.pull_request.draft)
+    env:
+      PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
+      PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+      COMPANY_ID: 5f0aac9d-4e21-456f-b1ce-9fe0122e4eb2
+      CLOUDY_ID: f49bd6f0-49bc-4e38-80d2-69b97ec66768
+      CODY_ID: 7e926fc1-bff0-47e5-ace7-e5307ad69423
+      TESTY_ID: 819e3820-4f5a-401c-9d15-930b0a93f855
+    steps:
+      - name: Resolve target agent
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            echo "agent_id=$TESTY_ID" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "pull_request_review" ]; then
+            case "$PR_AUTHOR" in
+              "radiusred-cloudy[bot]") echo "agent_id=$CLOUDY_ID" >> "$GITHUB_OUTPUT" ;;
+              "radiusred-cody[bot]")   echo "agent_id=$CODY_ID" >> "$GITHUB_OUTPUT" ;;
+              *)                        echo "agent_id=" >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
+
+      - name: Create Paperclip notification issue
+        if: steps.resolve.outputs.agent_id != ''
+        env:
+          AGENT_ID: ${{ steps.resolve.outputs.agent_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          REPO_NAME: ${{ github.repository }}
+          REVIEW_STATE: ${{ github.event.review.state }}
+          REVIEWER: ${{ github.event.review.user.login }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request_review" ]; then
+            ISSUE_TITLE="PR #${PR_NUMBER} review (${REVIEW_STATE}): ${PR_TITLE}"
+          else
+            ISSUE_TITLE="PR #${PR_NUMBER} ${EVENT_ACTION}: ${PR_TITLE}"
+          fi
+          ISSUE_TITLE="${ISSUE_TITLE:0:200}"
+
+          PAYLOAD=$(jq -n \
+            --arg title "$ISSUE_TITLE" \
+            --arg assigneeAgentId "$AGENT_ID" \
+            --arg event "$EVENT_NAME" \
+            --arg action "$EVENT_ACTION" \
+            --argjson pr_number "${PR_NUMBER:-0}" \
+            --arg pr_title "$PR_TITLE" \
+            --arg pr_url "$PR_URL" \
+            --arg pr_author "$PR_AUTHOR" \
+            --arg pr_branch "$PR_BRANCH" \
+            --arg pr_body "${PR_BODY:0:500}" \
+            --arg repo "$REPO_NAME" \
+            --arg review_state "${REVIEW_STATE:-}" \
+            --arg reviewer "${REVIEWER:-}" \
+            --arg review_body "${REVIEW_BODY:0:500}" \
+            '{
+              title: $title,
+              description: (
+                if $event == "pull_request_review" then
+                  "**Review by:** " + $reviewer + "\n**State:** " + $review_state + "\n**PR:** [#" + ($pr_number|tostring) + "](" + $pr_url + ")\n**Repo:** " + $repo + "\n**Branch:** `" + $pr_branch + "`\n\n" + $review_body
+                else
+                  "**Author:** " + $pr_author + "\n**PR:** [#" + ($pr_number|tostring) + "](" + $pr_url + ")\n**Repo:** " + $repo + "\n**Branch:** `" + $pr_branch + "`\n\n" + $pr_body
+                end
+              ),
+              assigneeAgentId: $assigneeAgentId,
+              status: "todo",
+              priority: "medium"
+            }')
+
+          curl -sf -X POST \
+            -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "${PAPERCLIP_API_URL}/api/companies/${COMPANY_ID}/issues"
