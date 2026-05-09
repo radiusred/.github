@@ -8,7 +8,7 @@ on:
         required: true
     secrets:
       RELEASE_CLIENT_ID:
-        required: true
+        required: false
       RELEASE_APP_PRIVATE_KEY:
         required: true
 
@@ -23,7 +23,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          client-id: ${{ secrets.RELEASE_CLIENT_ID }}
+          client-id: ${{ secrets.RELEASE_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
       - name: Checkout Code
@@ -52,7 +52,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          client-id: ${{ secrets.RELEASE_CLIENT_ID }}
+          client-id: ${{ secrets.RELEASE_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
       - name: Checkout Code
