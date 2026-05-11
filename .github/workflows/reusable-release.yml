@@ -9,11 +9,6 @@ on:
     secrets:
       RELEASE_APP_CLIENT_ID:
         required: false
-      RELEASE_CLIENT_ID:
-        # Deprecated alias of RELEASE_APP_CLIENT_ID. Prefer the new name to
-        # match RELEASE_APP_PRIVATE_KEY. Kept temporarily for callers that
-        # still forward the old input.
-        required: false
       RELEASE_APP_PRIVATE_KEY:
         required: true
 
@@ -28,7 +23,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID || secrets.RELEASE_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
       - name: Checkout Code
@@ -57,7 +52,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID || secrets.RELEASE_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
       - name: Checkout Code
