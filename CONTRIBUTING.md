@@ -8,6 +8,7 @@ refer to the `CONTRIBUTING.md` in each repository:
 
 - [`tradedesk`](https://github.com/radiusred/tradedesk)
 - [`tradedesk-dukascopy`](https://github.com/radiusred/tradedesk-dukascopy)
+- [`tradedesk-miner`](https://github.com/radiusred/tradedesk-miner)
 
 ## Getting Started
 
