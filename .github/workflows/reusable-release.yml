@@ -95,8 +95,14 @@ jobs:
           set -euo pipefail
           BRANCH="release/${NEW_TAG}"
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
-            echo "::error::Release branch $BRANCH already exists on origin. Delete it and retry." >&2
-            exit 1
+            # A prior run already cut this release branch. This is the normal
+            # "re-run after the release PR was opened but not yet merged" case,
+            # so resume instead of failing: reuse the existing branch and let
+            # the Open Release PR / Wait for Merge steps pick up the open PR.
+            # Do NOT delete the branch — that would close the in-flight release PR.
+            echo "::notice::Release branch $BRANCH already exists on origin; resuming with the existing branch and its open release PR."
+            echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           git checkout -b "$BRANCH"
           python3 - << 'PYEOF'
@@ -128,12 +134,21 @@ jobs:
           BRANCH: ${{ steps.bump.outputs.branch }}
         run: |
           set -euo pipefail
-          PR_URL=$(gh pr create \
-            --base main \
-            --head "$BRANCH" \
-            --title "chore: release ${NEW_TAG}" \
-            --body "Automated release bump for ${NEW_TAG}. Reviewer: please rebase-merge once CI is green; the calling workflow will then tag and create the GitHub release.")
-          PR_NUMBER=$(gh pr view "$PR_URL" --json number --jq .number)
+          # Reuse an existing open release PR if one is already present (resumed
+          # run), otherwise open a fresh one. Keeps re-runs idempotent.
+          PR_NUMBER=$(gh pr list --head "$BRANCH" --base main --state open \
+            --json number --jq '.[0].number // empty')
+          if [ -n "$PR_NUMBER" ]; then
+            PR_URL=$(gh pr view "$PR_NUMBER" --json url --jq .url)
+            echo "::notice::Reusing existing open release PR #$PR_NUMBER for $BRANCH."
+          else
+            PR_URL=$(gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "chore: release ${NEW_TAG}" \
+              --body "Automated release bump for ${NEW_TAG}. Reviewer: please rebase-merge once CI is green; the calling workflow will then tag and create the GitHub release.")
+            PR_NUMBER=$(gh pr view "$PR_URL" --json number --jq .number)
+          fi
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
