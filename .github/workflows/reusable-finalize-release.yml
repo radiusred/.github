@@ -1,0 +1,82 @@
+name: Reusable Finalize Release
+
+# Tags and publishes the GitHub release after a release PR has merged. This is
+# decoupled from reusable-release.yml so the release runner can exit immediately
+# after opening the PR (no idle poll loop). Consuming repos call this from a
+# finalize-release workflow triggered on the release PR's merge.
+
+on:
+  workflow_call:
+    inputs:
+      release_branch:
+        description: "The merged release branch, e.g. release/v1.2.3"
+        type: string
+        required: true
+      merge_sha:
+        description: "The merge commit SHA to tag and target the release at"
+        type: string
+        required: true
+    secrets:
+      RELEASE_APP_CLIENT_ID:
+        required: false
+      RELEASE_APP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID || 'Iv23liJJ7akrgLiP3Kti' }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Resolve Tag
+        id: tag
+        env:
+          RELEASE_BRANCH: ${{ inputs.release_branch }}
+        run: |
+          set -euo pipefail
+          # release/v1.2.3 -> v1.2.3
+          TAG="${RELEASE_BRANCH#release/}"
+          if [ "$TAG" = "$RELEASE_BRANCH" ] || [ -z "$TAG" ]; then
+            echo "::error::Could not derive a tag from release branch '${RELEASE_BRANCH}' (expected 'release/<tag>')." >&2
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+          ref: ${{ inputs.merge_sha }}
+
+      - name: Generate Release Notes
+        id: notes
+        if: hashFiles('cliff.toml') != ''
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --unreleased --tag ${{ steps.tag.outputs.tag }} --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          NEW_TAG: ${{ steps.tag.outputs.tag }}
+          TARGET_SHA: ${{ inputs.merge_sha }}
+        run: |
+          set -euo pipefail
+          if gh release view "$NEW_TAG" >/dev/null 2>&1; then
+            echo "::notice::Release ${NEW_TAG} already exists; skipping create."
+            exit 0
+          fi
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create "$NEW_TAG" --target "$TARGET_SHA" --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$NEW_TAG" --target "$TARGET_SHA" --generate-notes
+          fi
