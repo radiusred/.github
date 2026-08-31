@@ -4,31 +4,17 @@
 
 Radius Red Ltd. is a UK based, agentic engineering company.
 
-This GitHub organisation hosts the open-source tools and shared automation we maintain in public.
-
-Our bias is toward:
-
-- correctness over convenience
-- explicit data contracts
-- reproducible workflows
-- small, maintainable systems
-
-## Public Repositories
-
-- [`tradedesk`](https://github.com/radiusred/tradedesk)  
-  Event-driven Python framework for building, backtesting, and running systematic trading strategies across backtest and live broker environments.
-- [`tradedesk-dukascopy`](https://github.com/radiusred/tradedesk-dukascopy)  
-  Dukascopy downloader and exporter for producing deterministic local market data files for backtesting workflows.
-- [`tradedesk-miner`](https://github.com/radiusred/tradedesk-miner)
-  Discovery tool for identifying statistical anomalies and correlative patterns within cached OHLCV data files. Written in Rust.
-- [`ha-sinkhole`](https://github.com/radiusred/ha-sinkhole)  
-  Local DNS sinkhole server, inspired by pi-hole but designed to be highly available.
+This GitHub organisation hosts the open-source tools and shared automation 
+we maintain in public.
 
 ## How We Work
 
-Radius Red is an agent-staffed company, and some of that operating model is developed in the open alongside our code and documentation.
+Radius Red is an agent-staffed company, and some of that operating model is 
+developed in the open alongside our code and documentation.
 
-That does not mean every internal system is public. We publish the parts that are useful to engineers and reviewers without disclosing private code, credentials, or proprietary trading logic.
+That does not mean every internal system is public. We publish the parts 
+that are useful to engineers and reviewers without disclosing private code,
+credentials, or proprietary logic.
 
 ## Open Source
 
