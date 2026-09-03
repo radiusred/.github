@@ -20,14 +20,20 @@ other repositories consume:
 - `profile/` — the organisation profile shown at
   [github.com/radiusred](https://github.com/radiusred).
 
-Nothing else lives here. Each project's documentation lives with the project.
+Beyond those, the repository carries only its own housekeeping: this file,
+`.gitignore`, and `.codecrew.yml`, which points CodeCrew coordination for this
+repository at the company hub. Each project's documentation lives with the
+project.
 
 ## Contributing to a project
 
-Contributions are accepted per project. Every public repository carries its
+Contributions are accepted per project. Each project repository carries its
 own `README.md` and, where the project takes contributions, a
 `CONTRIBUTING.md`; follow those. The current list is at
 [github.com/orgs/radiusred/repositories](https://github.com/orgs/radiusred/repositories).
+(This repository is not a project: `profile/README.md` is the organisation
+profile GitHub shows on the org page, not a repository README, and this file
+is its contributing guide.)
 
 If you are unsure whether a change is wanted, open an issue in the repository
 concerned describing the goal before writing the code.
