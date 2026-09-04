@@ -10,27 +10,32 @@ runs:
   using: composite
   steps:
     - name: Place the shared commitlint config in the workspace
+      id: stage
       shell: bash
       # wagoid/commitlint-github-action is a Docker action. It resolves
       # configFile against GITHUB_WORKSPACE inside its container, and the
       # runner's _actions directory (where this action is checked out) is
       # not mounted there, so a path into the action directory would fall
       # back silently to bare config-conventional. Copy the config into the
-      # workspace instead and print it, so the log shows what was linted
-      # against.
+      # workspace instead, into a directory this action creates itself:
+      # mktemp -d makes a fresh, uniquely named directory and fails rather
+      # than reuse one, so nothing the caller owns is overwritten, and the
+      # cleanup below removes only that directory.
       run: |
-        target="${GITHUB_WORKSPACE}/.radiusred-commitlint"
-        mkdir -p "${target}"
-        cp "${{ github.action_path }}/commitlint.config.mjs" "${target}/commitlint.config.mjs"
-        echo "commitlint config placed at ${target}/commitlint.config.mjs:"
-        cat "${target}/commitlint.config.mjs"
+        dir="$(mktemp -d "${GITHUB_WORKSPACE}/.radiusred-commitlint-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.XXXXXXXX")"
+        cp "${{ github.action_path }}/commitlint.config.mjs" "${dir}/commitlint.config.mjs"
+        echo "dir=${dir#"${GITHUB_WORKSPACE}/"}" >> "${GITHUB_OUTPUT}"
+        echo "commitlint config placed at ${dir}/commitlint.config.mjs:"
+        cat "${dir}/commitlint.config.mjs"
 
     - name: Lint the commit messages
       uses: wagoid/commitlint-github-action@v6.2.1
       with:
-        configFile: .radiusred-commitlint/commitlint.config.mjs
+        configFile: ${{ steps.stage.outputs.dir }}/commitlint.config.mjs
 
     - name: Remove the copied config
-      if: always()
+      if: always() && steps.stage.outputs.dir != ''
       shell: bash
-      run: rm -rf "${GITHUB_WORKSPACE}/.radiusred-commitlint"
+      env:
+        STAGE_DIR: ${{ steps.stage.outputs.dir }}
+      run: rm -rf "${GITHUB_WORKSPACE}/${STAGE_DIR}"
