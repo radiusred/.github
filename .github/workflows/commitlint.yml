@@ -1,3 +1,8 @@
+# Reference caller for the shared commitlint action. Other repositories copy
+# this file and replace the local `uses:` path with
+# `radiusred/.github/.github/actions/commitlint@main`; this repository calls
+# the action by path so a PR here tests the version of the action it carries.
+# The job name is the check context the org ruleset require-lint requires.
 name: Lint commit messages
 
 on:
@@ -5,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   commitlint:
@@ -14,4 +20,4 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v6
+      - uses: ./.github/actions/commitlint
