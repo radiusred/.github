@@ -1,0 +1,36 @@
+name: Lint commit messages
+description: >-
+  Lints a pull request's commit messages against the Radius Red commitlint
+  config shipped in this directory (Conventional Commits). The action does
+  not check out: the caller runs actions/checkout with fetch-depth 0 first,
+  from a job named exactly "Lint commit messages" (the org ruleset
+  require-lint pins that check context). See CONTRIBUTING.md.
+
+runs:
+  using: composite
+  steps:
+    - name: Place the shared commitlint config in the workspace
+      shell: bash
+      # wagoid/commitlint-github-action is a Docker action. It resolves
+      # configFile against GITHUB_WORKSPACE inside its container, and the
+      # runner's _actions directory (where this action is checked out) is
+      # not mounted there, so a path into the action directory would fall
+      # back silently to bare config-conventional. Copy the config into the
+      # workspace instead and print it, so the log shows what was linted
+      # against.
+      run: |
+        target="${GITHUB_WORKSPACE}/.radiusred-commitlint"
+        mkdir -p "${target}"
+        cp "${{ github.action_path }}/commitlint.config.mjs" "${target}/commitlint.config.mjs"
+        echo "commitlint config placed at ${target}/commitlint.config.mjs:"
+        cat "${target}/commitlint.config.mjs"
+
+    - name: Lint the commit messages
+      uses: wagoid/commitlint-github-action@v6.2.1
+      with:
+        configFile: .radiusred-commitlint/commitlint.config.mjs
+
+    - name: Remove the copied config
+      if: always()
+      shell: bash
+      run: rm -rf "${GITHUB_WORKSPACE}/.radiusred-commitlint"
