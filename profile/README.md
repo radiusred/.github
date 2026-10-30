@@ -1,4 +1,8 @@
-![banner](banner-whitetext.webp)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="banner-dark.webp">
+  <source media="(prefers-color-scheme: light)" srcset="banner-light.webp">
+  <img alt="Radius Red: agentic engineering" src="banner-light.webp">
+</picture>
 
 # Radius Red Ltd.
 
